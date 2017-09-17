@@ -10,6 +10,10 @@ import {
 } from "react-native";
 import Screen from "./ScreenFlex";
 import ActionBox from "./ActionBox";
+
+let scrollHeight = 0;
+let currentheight = 0;
+
 // create a component
 class SettingTitleComponent extends Component {
   constructor(props) {
@@ -25,30 +29,39 @@ class SettingTitleComponent extends Component {
     // body
     this.setState({
       text: event.nativeEvent.text,
-    
+
       input_height: event.nativeEvent.contentSize.height
     });
-    this.props._onChanageScrollViewHeight("sssss");
   };
 
-  _onChange2 = event => {
-    // body
-  };
+  _onContetSizeChange(event) {
+    // event: {nativeEvent: {contentSize: { width: number, height: number}}}
+    contentHeight = event.nativeEvent.contentSize.height;
 
+    console.log(
+      " --------_onContetSizeChange () - > contentHeight = " + contentHeight
+    );
+
+    // scrollHeight = contentHeight - currentheight;
+
+    this.props._onChanageScrollViewHeight(contentHeight);
+
+    // currentheight = contentHeight;
+    // console.log(" ========== currentheight = " + currentheight);
+    // console.log(" ========== scrollHeight = " + scrollHeight);
+  }
+  _chanageActionBoxState(state){
+    console.log("state ===== " + state);
+    this.props.chanageActionBoxState(state)
+  }
   render() {
     return (
       <View style={[styles.container, { flexDirection: "column" }]}>
-
-      
         <TextInput
-          style={[
-            styles.inputs,
-            { height:45 }
-          ]}
+          style={[styles.inputs, { height: 45 }]}
           placeholder="标题"
-         
-          
           multiline={true}
+          onFocus = {this._chanageActionBoxState.bind(this,false)}
         />
 
         <KeyboardAvoidingView behavior="padding">
@@ -57,6 +70,8 @@ class SettingTitleComponent extends Component {
             placeholderTextColor="#c0c0c0"
             onChange={this._onChange}
             value={this.state.text}
+            onContentSizeChange={this._onContetSizeChange.bind(this)}
+            onFocus = {this._chanageActionBoxState.bind(this,true)}
             multiline={true}
             style={{
               width: Screen.screenWidth,
@@ -68,8 +83,6 @@ class SettingTitleComponent extends Component {
             }}
           />
         </KeyboardAvoidingView>
-
-
       </View>
     );
   }
@@ -80,7 +93,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     width: Screen.screenWidth,
- 
+
     alignItems: "center",
     backgroundColor: "red"
   },
