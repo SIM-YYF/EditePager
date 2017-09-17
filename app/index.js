@@ -21,27 +21,57 @@ export default class editPagerComponet extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      _show_action_box: null
+      _show_action_box: null,
+      _hider_keyborder: false
     };
   }
+  componentWillMount () {
+    this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this._keyboardDidShow.bind(this));
+    this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this._keyboardDidHide.bind(this));
+  }
+
+  componentWillUnmount () {
+    this.keyboardDidShowListener.remove();
+    this.keyboardDidHideListener.remove();
+  }
+
+  _keyboardDidShow () {
+    
+  }
+
+  _keyboardDidHide () {
+    this.setState({
+      _show_action_box:102,
+      
+    })
+  }
+
 
   chanageActionBoxState(isShow){
     console.log("-------------- ")
     this.setState({
       _show_action_box:isShow
     })
+    console.log('this',this)
   }
   _renderActionBox() {
     console.log( "this.state._show_action_box =====" + this.state._show_action_box);
-    if(this.state._show_action_box === null){
-      return null;
+    let isHide = false
+    if(this.state._show_action_box === null || this.state._show_action_box === 102 || this.state._show_action_box === 100){
+      isHide = true
     }
+
+    console.log('=============== isHide = ',  isHide,this.state._show_action_box);
     return (
       <KeyboardAvoidingView
-        keyboardVerticalOffset={this.state._show_action_box?100:0}
-        style={{ position: "absolute", bottom: 0 }}
+       
+        keyboardVerticalOffset={0}
+        style={{ position: "absolute", bottom: 0}}
         behavior="position"
+
       >
+      {
+        isHide?null:
         <View
           style={{
             flex: 1,
@@ -49,7 +79,8 @@ export default class editPagerComponet extends Component {
             backgroundColor: "#c0c0c0",
             flexDirection: "row",
             width: Screen.screenWidth,
-            padding: 10
+            padding: 10,
+
           }}
         >
           <TouchableHighlight>
@@ -79,6 +110,8 @@ export default class editPagerComponet extends Component {
             <Text>隐藏</Text>
           </TouchableHighlight>
         </View>
+      }
+        
       </KeyboardAvoidingView>
     );
   }

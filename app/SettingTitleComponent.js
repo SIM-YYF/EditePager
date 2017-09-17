@@ -51,9 +51,12 @@ class SettingTitleComponent extends Component {
     // console.log(" ========== scrollHeight = " + scrollHeight);
   }
   _chanageActionBoxState(state){
+    console.log("----------- _onLayout ----------")
     console.log("state ===== " + state);
     this.props.chanageActionBoxState(state)
   }
+
+
   render() {
     return (
       <View style={[styles.container, { flexDirection: "column" }]}>
@@ -61,7 +64,9 @@ class SettingTitleComponent extends Component {
           style={[styles.inputs, { height: 45 }]}
           placeholder="标题"
           multiline={true}
-          onFocus = {this._chanageActionBoxState.bind(this,false)}
+          onFocus = {this._chanageActionBoxState.bind(this,100)}
+         
+          
         />
 
         <KeyboardAvoidingView behavior="padding">
@@ -69,9 +74,10 @@ class SettingTitleComponent extends Component {
             placeholder="正文"
             placeholderTextColor="#c0c0c0"
             onChange={this._onChange}
+            
             value={this.state.text}
             onContentSizeChange={this._onContetSizeChange.bind(this)}
-            onFocus = {this._chanageActionBoxState.bind(this,true)}
+            onFocus = {this._chanageActionBoxState.bind(this,101)}
             multiline={true}
             style={{
               width: Screen.screenWidth,
