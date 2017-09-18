@@ -10,9 +10,10 @@ import {
 } from "react-native";
 import Screen from "./ScreenFlex";
 import ActionBox from "./ActionBox";
+import RCTDeviceEventEmitter from "RCTDeviceEventEmitter";
 
 let scrollHeight = 0;
-let currentheight = 0;
+const currentheight = 0;
 
 // create a component
 class SettingTitleComponent extends Component {
@@ -21,16 +22,51 @@ class SettingTitleComponent extends Component {
 
     this.state = {
       text: "",
-      input_height: 45
+      input_height: 45,
+      target_input:null,
+      inputs:["mb_default"]
     };
   }
 
-  _onChange = event => {
+  componentDidMount() {
+    this.listener = RCTDeviceEventEmitter.addListener("updateStyle", (style) => {
+      // 接受到通知后的处理
+      console.log(" ====== 接受对方传递的事件 =====", style)
+      //this.props.refs.aaa.style
+      console.log("============== this.refs.mb_default.style. ===== ", this.refs.mb_default)
+      this.refs.mb_default.style.fontSize = 18
+      // for (let i = 0; i < this.state.inputs.length; i++) {
+      //   let element = this.state.inputs[i];
+      //   console.log("========== element = ", element)
+      //   for (let key in this.refs) {
+      //     console.log("========== key = ", key)
+      //       if(element === key){
+      //         const {key} = this.refs
+      //         console.log('=========== this', this)
+      //         console.log("========== this.refs[key] = ", this.refs[key])
+      //         // this.refs.key.style.fontSize = 18
+      //         return;
+      //       }
+      //   }
+        
+      // }
+
+    });
+  }
+
+  
+ componentWillUnmount() {
+  //  移除接受通知事件监听
+  this.listener.remove();
+ }
+
+ _onChange(event) {
     // body
     this.setState({
       text: event.nativeEvent.text,
-
-      input_height: event.nativeEvent.contentSize.height
+      input_height: event.nativeEvent.contentSize.height,
+      target_input: event.nativeEvent.target
+      
     });
   };
 
@@ -38,24 +74,12 @@ class SettingTitleComponent extends Component {
     // event: {nativeEvent: {contentSize: { width: number, height: number}}}
     contentHeight = event.nativeEvent.contentSize.height;
 
-    console.log(
-      " --------_onContetSizeChange () - > contentHeight = " + contentHeight
-    );
-
-    // scrollHeight = contentHeight - currentheight;
-
     this.props._onChanageScrollViewHeight(contentHeight);
-
-    // currentheight = contentHeight;
-    // console.log(" ========== currentheight = " + currentheight);
-    // console.log(" ========== scrollHeight = " + scrollHeight);
   }
-  _chanageActionBoxState(state){
-    console.log("----------- _onLayout ----------")
-    console.log("state ===== " + state);
-    this.props.chanageActionBoxState(state)
+  _chanageActionBoxState(state) {
+   
+    this.props.chanageActionBoxState(state, this.state.input_height);
   }
-
 
   render() {
     return (
@@ -64,20 +88,18 @@ class SettingTitleComponent extends Component {
           style={[styles.inputs, { height: 45 }]}
           placeholder="标题"
           multiline={true}
-          onFocus = {this._chanageActionBoxState.bind(this,100)}
-         
-          
+          onFocus={this._chanageActionBoxState.bind(this, 100)}
         />
 
         <KeyboardAvoidingView behavior="padding">
           <TextInput
+            ref="mb_default"
             placeholder="正文"
             placeholderTextColor="#c0c0c0"
-            onChange={this._onChange}
-            
+            onChange={this._onChange.bind(this)}
             value={this.state.text}
             onContentSizeChange={this._onContetSizeChange.bind(this)}
-            onFocus = {this._chanageActionBoxState.bind(this,101)}
+            onFocus={this._chanageActionBoxState.bind(this, 101)}
             multiline={true}
             style={{
               width: Screen.screenWidth,
