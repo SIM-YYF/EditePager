@@ -24,17 +24,42 @@ class SettingTitleComponent extends Component {
       text: "",
       input_height: 45,
       target_input:null,
+      fontSize: 14,
+      backgroundStyle: '#00000000',
       inputs:["mb_default"]
     };
   }
 
   componentDidMount() {
-    this.listener = RCTDeviceEventEmitter.addListener("updateStyle", (style) => {
+
+    this.listener = RCTDeviceEventEmitter.addListener("updateStyle", (fs) => {
+      console.log('--------------RCTDeviceEventEmitter')
+
       // 接受到通知后的处理
-      console.log(" ====== 接受对方传递的事件 =====", style)
+      // console.log(" ====== 接受对方传递的事件 =====", style)
       //this.props.refs.aaa.style
-      console.log("============== this.refs.mb_default.style. ===== ", this.refs.mb_default)
-      this.refs.mb_default.style.fontSize = 18
+      // console.log("============== this.refs.mb_default.style. ===== ", this.refs.mb_default)
+      // this.refs.mb_default.style.fontSize = 18
+      let fsInt = parseInt(fs);
+      let tempFontSize = 14;
+      let tempBackGroundColor = "#00000000";
+      if (fsInt === 0) {
+        tempFontSize = 18;
+      } else if (fsInt === 1) {
+        tempFontSize = 12;
+      } else if (fsInt === 2) {
+        tempFontSize = 14;
+      } else if (fsInt === 3) {
+        //引用
+        tempBackGroundColor = "#c0c0c0";
+      } else {
+        // 列表
+      }
+      console.log(tempFontSize,tempBackGroundColor)
+      this.setState({
+        fontSize: tempFontSize,
+        backgroundStyle: tempBackGroundColor
+      });
       // for (let i = 0; i < this.state.inputs.length; i++) {
       //   let element = this.state.inputs[i];
       //   console.log("========== element = ", element)
@@ -48,9 +73,7 @@ class SettingTitleComponent extends Component {
       //         return;
       //       }
       //   }
-        
       // }
-
     });
   }
 
@@ -59,7 +82,6 @@ class SettingTitleComponent extends Component {
   //  移除接受通知事件监听
   this.listener.remove();
  }
-
  _onChange(event) {
     // body
     this.setState({
@@ -104,6 +126,7 @@ class SettingTitleComponent extends Component {
             style={{
               width: Screen.screenWidth,
               height: Math.max(45, this.state.input_height),
+              fontSize:this.state.fontSize,
               borderWidth: 0,
               marginTop: 20,
               marginLeft: 10,

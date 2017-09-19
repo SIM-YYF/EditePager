@@ -20,6 +20,7 @@ import Screen from "./ScreenFlex";
 import RadiusButton from "./RadiusButton";
 import dismissKeyboard from "dismissKeyboard";
 import StyleModal from './StyleModal'
+import RCTDeviceEventEmitter from 'RCTDeviceEventEmitter' 
 export default class editPagerComponet extends Component {
   constructor(props) {
     super(props);
@@ -66,7 +67,7 @@ export default class editPagerComponet extends Component {
 
   // 插入图片
   _show_add_image() {
-    alert("msg2");
+    RCTDeviceEventEmitter.emit('addImages',params);  
   }
 
   // 修改样式
@@ -109,6 +110,7 @@ export default class editPagerComponet extends Component {
               <Image
                 style={{ marginLeft: 5, width: 25, height: 25 }}
                 source={require("./images/add_image.png")}
+
               />
             </TouchableHighlight>
             <TouchableHighlight
