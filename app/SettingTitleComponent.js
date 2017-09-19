@@ -1,17 +1,19 @@
 //import liraries
 import React, { Component } from "react";
-import {
+import aaa, {
   View,
   Text,
   StyleSheet,
   TextInput,
   Image,
-  KeyboardAvoidingView
+  KeyboardAvoidingView,
+  TouchableHighlight,
+  findNodeHandle
 } from "react-native";
 import Screen from "./ScreenFlex";
 import ActionBox from "./ActionBox";
 import RCTDeviceEventEmitter from "RCTDeviceEventEmitter";
-
+console.log('aaa',aaa)
 let scrollHeight = 0;
 const currentheight = 0;
 
@@ -26,19 +28,25 @@ class SettingTitleComponent extends Component {
       target_input:null,
       fontSize: 14,
       backgroundStyle: '#00000000',
-      inputs:["mb_default"]
+      inputs:["mb_default"],
+      imgArr:[]
     };
   }
 
   componentDidMount() {
+    const self = this;
+    this.imageListener = RCTDeviceEventEmitter.addListener("addImages", (fs) => {
 
+      var newimgArr = self.state.imgArr.slice(0)
+      newimgArr.push(fs)
+      self.setState({
+        imgArr:newimgArr
+      })
+    })
     this.listener = RCTDeviceEventEmitter.addListener("updateStyle", (fs) => {
-      console.log('--------------RCTDeviceEventEmitter')
 
       // 接受到通知后的处理
-      // console.log(" ====== 接受对方传递的事件 =====", style)
       //this.props.refs.aaa.style
-      // console.log("============== this.refs.mb_default.style. ===== ", this.refs.mb_default)
       // this.refs.mb_default.style.fontSize = 18
       let fsInt = parseInt(fs);
       let tempFontSize = 14;
@@ -55,20 +63,15 @@ class SettingTitleComponent extends Component {
       } else {
         // 列表
       }
-      console.log(tempFontSize,tempBackGroundColor)
       this.setState({
         fontSize: tempFontSize,
         backgroundStyle: tempBackGroundColor
       });
       // for (let i = 0; i < this.state.inputs.length; i++) {
       //   let element = this.state.inputs[i];
-      //   console.log("========== element = ", element)
       //   for (let key in this.refs) {
-      //     console.log("========== key = ", key)
       //       if(element === key){
       //         const {key} = this.refs
-      //         console.log('=========== this', this)
-      //         console.log("========== this.refs[key] = ", this.refs[key])
       //         // this.refs.key.style.fontSize = 18
       //         return;
       //       }
@@ -98,11 +101,74 @@ class SettingTitleComponent extends Component {
 
     this.props._onChanageScrollViewHeight(contentHeight);
   }
-  _chanageActionBoxState(state) {
-   
+  _chanageActionBoxState(state,e) {
+    console.log('-------------------_chanageActionBoxState')
+    console.log(this.refs)
+    console.log(findNodeHandle(this.refs['input_0']))
+    console.log(e.target)
     this.props.chanageActionBoxState(state, this.state.input_height);
   }
-
+  imgPress(index,e){
+    var newimgArr = this.state.imgArr.slice(0)
+    newimgArr[index].isDel = true
+    // const delArr = newimgArr.splice(index,1)[0]
+    // console.log('delArr',delArr)
+    this.setState({
+      imgArr:newimgArr
+    })
+  }
+  _dynamic_add_txtInput() {
+    const self = this;
+    const imgArr = this.state.imgArr
+    return imgArr.map((ele,index)=>{
+      return (
+        <View
+        key={index}
+        style={{
+          flex: 1,
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#000088"
+        }}
+      >
+        {ele.isDel === true ?null: <TouchableHighlight
+                  ref={`img_${index}`}
+                  data-type={index}
+                  onPress={this.imgPress.bind(this,index)}
+                >
+                  <Image
+                    style={{ width: 100, height: 100 }}
+                    source={require("./images/ic_launcher.png")}
+                  />
+                </TouchableHighlight>}
+       
+          <TextInput
+            ref={`input_${index}`}
+            data-type={index}
+            placeholder="继续...."
+            placeholderTextColor="#c0c0c0"
+            onChange={self._onChange.bind(self)}
+            value={self.state.text}
+            onContentSizeChange={self._onContetSizeChange.bind(self)}
+            onFocus={self._chanageActionBoxState.bind(self, 101)}
+            multiline={true}
+            style={{
+              width: Screen.screenWidth,
+              height: Math.max(45, self.state.input_height),
+              borderWidth: 0,
+              marginTop: 20,
+              marginLeft: 10,
+              fontSize: self.state.fontSize,
+              borderColor: "#00000000"
+            }}
+          />
+      
+      </View>
+      );
+    })
+    
+  }
   render() {
     return (
       <View style={[styles.container, { flexDirection: "column" }]}>
@@ -112,7 +178,6 @@ class SettingTitleComponent extends Component {
           multiline={true}
           onFocus={this._chanageActionBoxState.bind(this, 100)}
         />
-
         <KeyboardAvoidingView behavior="padding">
           <TextInput
             ref="mb_default"
@@ -134,6 +199,7 @@ class SettingTitleComponent extends Component {
             }}
           />
         </KeyboardAvoidingView>
+        {this._dynamic_add_txtInput.bind(this)()}
       </View>
     );
   }
